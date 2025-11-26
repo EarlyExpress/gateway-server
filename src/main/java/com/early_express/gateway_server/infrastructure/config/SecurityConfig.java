@@ -11,7 +11,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @EnableWebFluxSecurity
 public class SecurityConfig {
 
-    @Bean
+	private final CustomAuthenticationEntryPoint entryPoint;
+
+	public SecurityConfig(CustomAuthenticationEntryPoint entryPoint) {
+		this.entryPoint = entryPoint;
+	}
+
+	@Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 		ReactiveJwtAuthenticationConverter conv = new ReactiveJwtAuthenticationConverter();
 		conv.setJwtGrantedAuthoritiesConverter(new KeycloakClientRoleConverter());
@@ -23,6 +29,7 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
 				.oauth2ResourceServer(oauth -> oauth.jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(conv)))
+				.exceptionHandling(exHandling -> exHandling.authenticationEntryPoint(entryPoint))
                 .build();
     }
 }
