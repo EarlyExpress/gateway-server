@@ -19,7 +19,7 @@ public class SecurityConfig {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
-						.pathMatchers("/v1/auth/web/public").permitAll()
+						.pathMatchers("/v1/auth/web/public/**").permitAll()
                         .anyExchange().authenticated()
                 )
 				.oauth2ResourceServer(oauth -> oauth.jwt(jwtSpec -> jwtSpec.jwtAuthenticationConverter(conv)))
