@@ -20,6 +20,8 @@ public class AddUserHeaderGlobalFilter implements GlobalFilter, Ordered {
 	private static final String HEADER_USERNAME = "X-Username";
 	private static final String HEADER_ROLE = "X-User-Role";
 	private static final String HEADER_EMAIL = "X-User-Email";
+	private static final String HEADER_AUTHORIZATION = "Authorization";
+	private static final String BEARER_PREFIX = "Bearer ";
 
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -34,11 +36,12 @@ public class AddUserHeaderGlobalFilter implements GlobalFilter, Ordered {
 												String role = extractRole(token);
 
 												ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
-																				  .header(HEADER_USER_ID, Objects.requireNonNullElse(token.getClaimAsString("user_id"), ""))
-																				  .header(HEADER_USERNAME, Objects.requireNonNullElse(token.getClaimAsString("username"), ""))
-																				  .header(HEADER_ROLE, role)
-																				  .header(HEADER_EMAIL, Objects.requireNonNullElse(token.getClaimAsString("email"), ""))
-																				  .build();
+																						   .header(HEADER_USER_ID, Objects.requireNonNullElse(token.getClaimAsString("user_id"), ""))
+																						   .header(HEADER_USERNAME, Objects.requireNonNullElse(token.getClaimAsString("username"), ""))
+																						   .header(HEADER_ROLE, role)
+																						   .header(HEADER_EMAIL, Objects.requireNonNullElse(token.getClaimAsString("email"), ""))
+																						   .header(HEADER_AUTHORIZATION, BEARER_PREFIX + token.getTokenValue())
+																						   .build();
 
 												ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
 												return chain.filter(mutatedExchange);
